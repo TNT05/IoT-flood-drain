@@ -3,6 +3,11 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Initial sensor values
+let waterDetect = false;
+let waterHeight = false;
+let pumpActive = false;
+
 // Use body-parser middleware to parse JSON requests
 app.use(bodyParser.json());
 
@@ -48,18 +53,18 @@ const html = `
         });
     }
 
-    // Add a function to handle incoming data from ESP32
+    // Fetch sensor data every second
+    setInterval(() => {
+      fetch("/getSensorData")
+        .then(response => response.json())
+        .then(data => handleSensorData(data))
+        .catch(error => console.error('Error fetching sensor data:', error));
+    }, 1000);
+
     function handleSensorData(data) {
       console.log('Received sensor data:', data);
-      // Update your webpage based on the received data
       updateDiagnostic(data.waterDetect, data.waterHeight);
     }
-
-    // Add an event listener for the 'sensorData' event
-    document.addEventListener('sensorData', function (e) {
-      handleSensorData(e.detail);
-    });
-
   </script>
 
   <h1>Water Diagnostic</h1>
@@ -79,14 +84,17 @@ app.get("/", (req, res) => res.type('html').send(html));
 app.post("/updateSensorData", (req, res) => {
   const sensorData = req.body;
   console.log('Received POST request from ESP32:', sensorData);
-
-  // Emit the 'sensorData' event to update the webpage
+  ({ waterDetect, waterHeight, pumpActive } = sensorData);
   res.json({ status: "success" });
-  const event = new CustomEvent('sensorData', { detail: sensorData });
-  res.app.emit('sensorData', event);
+});
+
+// Route to fetch the new values
+app.get("/getSensorData", (req, res) => {
+  res.json({ waterDetect, waterHeight, pumpActive });
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+// Timeout settings
 server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
