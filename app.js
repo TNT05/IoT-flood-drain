@@ -10,52 +10,68 @@ server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
 
 const html = `
+<!-- File: index.html -->
+
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Hello from Render!</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          disableForReducedMotion: true
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Diagnostic</title>
+  <style>
+    .water-theme {
+      background-color: #f0f8ff; /* Light Blue */
+      color: #003366; /* Dark Blue */
+    }
+  </style>
+</head>
+<body class="water-theme">
+  <script>
+    function updateRealTimeValue() {
+      console.log('Requesting real-time value...');
+      fetch('/getRealTimeValue')
+        .then(response => response.json())
+        .then(realTimeValue => {
+          console.log('Received real-time value:', realTimeValue);
+          updateDiagnostic(realTimeValue.waterDetect, realTimeValue.waterHeight);
+        })
+        .catch(error => console.error('Error during real-time value request:', error));
+    }
+
+    function updateDiagnostic(waterDetect, waterHeight) {
+      var detectCheckbox = document.getElementById('detectCheckbox');
+      var distanceCheckbox = document.getElementById('distanceCheckbox');
+      detectCheckbox.checked = waterDetect;
+      distanceCheckbox.checked = waterHeight;
+    }
+
+    setInterval(updateRealTimeValue, 3000);
+
+    function activatePump() {
+      console.log('Requesting pump activation...');
+      fetch('/activatePump')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text();
+        })
+        .then(pumpActivationResponse => {
+          console.log('Received pump activation response:', pumpActivationResponse);
+        })
+        .catch(error => {
+          console.error('Error during pump activation:', error);
         });
-      }, 500);
-    </script>
-    <style>
-      @import url("https://p.typekit.net/p.css?s=1&k=vnd5zic&ht=tk&f=39475.39476.39477.39478.39479.39480.39481.39482&a=18673890&app=typekit&e=css");
-      @font-face {
-        font-family: "neo-sans";
-        src: url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-        font-style: normal;
-        font-weight: 700;
-      }
-      html {
-        font-family: neo-sans;
-        font-weight: 700;
-        font-size: calc(62rem / 16);
-      }
-      body {
-        background: white;
-      }
-      section {
-        border-radius: 1em;
-        padding: 1em;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <section>
-      Hello from Render!
-    </section>
-  </body>
+    }
+  </script>
+
+  <h1>Water Diagnostic</h1>
+  <div>
+    <button onclick="activatePump()">Activate Pump</button>
+    <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
+    <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
+  </div>
+  <a href="/inline">Go here</a>
+</body>
 </html>
 `
