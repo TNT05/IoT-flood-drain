@@ -1,17 +1,14 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
+// Use body-parser middleware to parse JSON requests
+app.use(bodyParser.json());
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-server.keepAliveTimeout = 120 * 1000;
-server.headersTimeout = 120 * 1000;
-
+// HTML content
 const html = `
 <!-- File: index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,17 +24,6 @@ const html = `
 </head>
 <body class="water-theme">
   <script>
-    function updateRealTimeValue() {
-      console.log('Requesting real-time value...');
-      fetch('/getRealTimeValue')
-        .then(response => response.json())
-        .then(realTimeValue => {
-          console.log('Received real-time value:', realTimeValue);
-          updateDiagnostic(realTimeValue.waterDetect, realTimeValue.waterHeight);
-        })
-        .catch(error => console.error('Error during real-time value request:', error));
-    }
-
     function updateDiagnostic(waterDetect, waterHeight) {
       var detectCheckbox = document.getElementById('detectCheckbox');
       var distanceCheckbox = document.getElementById('distanceCheckbox');
@@ -63,6 +49,19 @@ const html = `
           console.error('Error during pump activation:', error);
         });
     }
+
+    // Add a function to handle incoming data from ESP32
+    function handleSensorData(data) {
+      console.log('Received sensor data:', data);
+      // Update your webpage based on the received data
+      updateDiagnostic(data.waterDetect, data.waterHeight);
+    }
+
+    // Add an event listener for the 'sensorData' event
+    document.addEventListener('sensorData', function (e) {
+      handleSensorData(e.detail);
+    });
+
   </script>
 
   <h1>Water Diagnostic</h1>
@@ -74,4 +73,22 @@ const html = `
   <a href="/inline">Go here</a>
 </body>
 </html>
-`
+`;
+
+app.get("/", (req, res) => res.type('html').send(html));
+
+// Route to handle incoming POST requests from the ESP32
+app.post("/updateSensorData", (req, res) => {
+  const sensorData = req.body;
+  console.log('Received POST request from ESP32:', sensorData);
+
+  // Emit the 'sensorData' event to update the webpage
+  res.json({ status: "success" });
+  const event = new CustomEvent('sensorData', { detail: sensorData });
+  res.app.emit('sensorData', event);
+});
+
+const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+server.keepAliveTimeout = 120 * 1000;
+server.headersTimeout = 120 * 1000;
