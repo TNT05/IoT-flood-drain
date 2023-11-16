@@ -31,8 +31,6 @@ const html = `
       distanceCheckbox.checked = waterHeight;
     }
 
-    setInterval(updateRealTimeValue, 3000);
-
     function activatePump() {
       console.log('Requesting pump activation...');
       fetch('/activatePump')
