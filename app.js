@@ -54,45 +54,49 @@ const html = `
         });
     }
 
-    // Fetch sensor data every second
+    // Fetch sensor data and manual mode every second
     setInterval(() => {
+      // Fetch sensor data
       fetch("/getSensorData")
         .then(response => response.json())
         .then(data => handleSensorData(data))
         .catch(error => console.error('Error fetching sensor data:', error));
-    }, {
+
+      // Fetch manual mode
       fetch("/getManualMode")
         .then(response => response.json())
-        .then(data => {console.log(data}))
-        .catch(error => console.error('Error fetching sensor data:', error));
-    }
-    ,1000);
+        .then(data => {
+          console.log('Manual Mode:', data.manualMode);
+          // Perform actions based on manual mode if needed
+        })
+        .catch(error => console.error('Error fetching manual mode:', error));
+    }, 1000);
 
     function handleSensorData(data) {
       console.log('Received sensor data:', data);
       updateDiagnostic(data.waterDetect, data.waterHeight);
     }
 
-    function handleModeChange(mode){
+    function handleModeChange(mode) {
       fetch("https://iot-flood-drain.onrender.com/setManualMode", {
         method: "POST",
         body: JSON.stringify({
-        manualMode: mode
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then((response) => response.json())
-      .then((json) => console.log(json));
+          manualMode: mode
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+        .then(response => response.json())
+        .then(json => console.log(json))
+        .catch(error => console.error('Error during mode change:', error));
     }
-    
   </script>
 
   <h1>Water Diagnostic</h1>
   <div>
     <button onclick="activatePump()">Activate Pump</button>
-    <button onclick="handleModeChange(true)">ManualMode</button>
+    <button onclick="handleModeChange(true)">Manual Mode</button>
     <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
     <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
   </div>
@@ -116,15 +120,15 @@ app.get("/getSensorData", (req, res) => {
   res.json({ waterDetect, waterHeight, pumpActive });
 });
 
-// Route to handle incoming POST requests of manualmode from the CLIENT
+// Route to handle incoming POST requests of manual mode from the CLIENT
 app.post("/setManualMode", (req, res) => {
- const manualModeRequest = req.body;
+  const manualModeRequest = req.body;
   console.log('Received POST request from CLIENT:', manualModeRequest);
   ({ manualMode } = manualModeRequest);
   res.json({ status: "success" });
 });
 
-// Route to fetch the manualmode from WEBSERVER
+// Route to fetch the manual mode from WEBSERVER
 app.get("/getManualMode", (req, res) => {
   res.json({ manualMode });
 });
