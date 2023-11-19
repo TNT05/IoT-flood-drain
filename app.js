@@ -184,6 +184,11 @@ app.post("/deactivatePump", (req, res) => {
   res.json({ status: "success" });
 });
 
+// Route to fetch the pump activation need from WEBSERVER
+app.get("/getActivatePump", (req, res) => {
+  res.json({ activatePump });
+});
+
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 // Timeout settings
