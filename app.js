@@ -131,6 +131,7 @@ const html = `
     <button id="activateButton" onclick="activatePump()">Activate Pump</button>
     <button id="deactivateButton" onclick="deactivatePump()">Deactivate Pump</button>
     <button onclick="handleModeChange(true)">Manual Mode</button>
+    <button onclick="handleModeChange(false)">Automatic Mode</button>
     <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
     <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
   </div>
