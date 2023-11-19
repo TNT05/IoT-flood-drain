@@ -7,6 +7,7 @@ const port = process.env.PORT || 3001;
 let waterDetect = false;
 let waterHeight = false;
 let pumpActive = false;
+let manualMode = false;
 
 // Use body-parser middleware to parse JSON requests
 app.use(bodyParser.json());
@@ -59,17 +60,39 @@ const html = `
         .then(response => response.json())
         .then(data => handleSensorData(data))
         .catch(error => console.error('Error fetching sensor data:', error));
-    }, 1000);
+    }, {
+      fetch("/getManualMode")
+        .then(response => response.json())
+        .then(data => {console.log(data}))
+        .catch(error => console.error('Error fetching sensor data:', error));
+    }
+    ,1000);
 
     function handleSensorData(data) {
       console.log('Received sensor data:', data);
       updateDiagnostic(data.waterDetect, data.waterHeight);
     }
+
+    function handleModeChange(mode){
+      fetch("https://iot-flood-drain.onrender.com/setManualMode", {
+        method: "POST",
+        body: JSON.stringify({
+        manualMode: mode
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+    }
+    
   </script>
 
   <h1>Water Diagnostic</h1>
   <div>
     <button onclick="activatePump()">Activate Pump</button>
+    <button onclick="handleModeChange(true)">ManualMode</button>
     <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
     <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
   </div>
@@ -88,9 +111,22 @@ app.post("/updateSensorData", (req, res) => {
   res.json({ status: "success" });
 });
 
-// Route to fetch the new values
+// Route to fetch the new values from WEBSERVER
 app.get("/getSensorData", (req, res) => {
   res.json({ waterDetect, waterHeight, pumpActive });
+});
+
+// Route to handle incoming POST requests of manualmode from the CLIENT
+app.post("/setManualMode", (req, res) => {
+ const manualModeRequest = req.body;
+  console.log('Received POST request from CLIENT:', manualModeRequest);
+  ({ manualMode } = manualModeRequest);
+  res.json({ status: "success" });
+});
+
+// Route to fetch the manualmode from WEBSERVER
+app.get("/getManualMode", (req, res) => {
+  res.json({ manualMode });
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
