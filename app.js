@@ -8,6 +8,7 @@ let waterDetect = false;
 let waterHeight = false;
 let pumpActive = false;
 let manualMode = false;
+let activatePump = false;
 
 // Use body-parser middleware to parse JSON requests
 app.use(bodyParser.json());
@@ -38,20 +39,33 @@ const html = `
     }
 
     function activatePump() {
-      console.log('Requesting pump activation...');
-      fetch('/activatePump')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.text();
-        })
-        .then(pumpActivationResponse => {
-          console.log('Received pump activation response:', pumpActivationResponse);
-        })
-        .catch(error => {
-          console.error('Error during pump activation:', error);
-        });
+      fetch("https://iot-flood-drain.onrender.com/activatePump", {
+        method: "POST",
+        body: JSON.stringify({
+          activatePump: true
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+        .then(response => response.json())
+        .then(json => console.log(json))
+        .catch(error => console.error('Error during mode change:', error));
+    }
+
+    function deactivatePump() {
+      fetch("https://iot-flood-drain.onrender.com/activatePump", {
+        method: "POST",
+        body: JSON.stringify({
+          activatePump: false
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+        .then(response => response.json())
+        .then(json => console.log(json))
+        .catch(error => console.error('Error during mode change:', error));
     }
 
     // Fetch sensor data and manual mode every second
@@ -67,10 +81,29 @@ const html = `
         .then(response => response.json())
         .then(data => {
           console.log('Manual Mode:', data.manualMode);
-          // Perform actions based on manual mode if needed
+          if(data.manualMode){
+            enableManualControl();
+          }
+          else{
+            disableManualControl();
+          }
         })
         .catch(error => console.error('Error fetching manual mode:', error));
     }, 1000);
+
+    function enableManualControl() {
+      var activatePumpButton = document.getElementById('activateButton');
+      var deactivatePumpButton = document.getElementById('deactivateButton');
+      activatePumpButton.disabled = false;
+      deactivatePumpButton.disabled = false;
+    }
+    
+    function disableManualControl() {
+      var activatePumpButton = document.getElementById('activateButton');
+      var deactivatePumpButton = document.getElementById('deactivateButton');
+      activatePumpButton.disabled = true;
+      deactivatePumpButton.disabled = true;
+    }
 
     function handleSensorData(data) {
       console.log('Received sensor data:', data);
@@ -95,7 +128,8 @@ const html = `
 
   <h1>Water Diagnostic</h1>
   <div>
-    <button onclick="activatePump()">Activate Pump</button>
+    <button id="activateButton" onclick="activatePump()">Activate Pump</button>
+    <button id="deactivateButton" onclick="deactivatePump()">Deactivate Pump</button>
     <button onclick="handleModeChange(true)">Manual Mode</button>
     <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
     <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
@@ -131,6 +165,22 @@ app.post("/setManualMode", (req, res) => {
 // Route to fetch the manual mode from WEBSERVER
 app.get("/getManualMode", (req, res) => {
   res.json({ manualMode });
+});
+
+// Route to handle incoming POST requests of pump activation from the CLIENT
+app.post("/activatePump", (req, res) => {
+  const activatePumpRequest = req.body;
+  console.log('Received POST request from CLIENT:', activatePumpRequest);
+  ({ activatePump } = activatePumpRequest);
+  res.json({ status: "success" });
+});
+
+// Route to handle incoming POST requests of pump activation from the CLIENT
+app.post("/deactivatePump", (req, res) => {
+  const deactivatePumpRequest = req.body;
+  console.log('Received POST request from CLIENT:', activatePumpRequest);
+  ({ activatePump } = deactivatePumpRequest);
+  res.json({ status: "success" });
 });
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
