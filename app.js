@@ -71,11 +71,9 @@ const html = `
       color: #32CD32; /* Lime Green */
     }
 
-    a {
-      display: block;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #003366;
+    .fa-play,
+    .fa-stop {
+      font-size: 1.5em;
     }
 
     /* Add animation */
@@ -94,14 +92,41 @@ const html = `
     }
 
     .alert {
-      animation: waterAlert 2s ease;
+      animation: waterAlert 1s ease;
+    }
+
+    /* Add pump vibration animation */
+    @keyframes pumpVibration {
+      0% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(5px);
+      }
+
+      50% {
+        transform: translateX(0);
+      }
+
+      75% {
+        transform: translateX(-5px);
+      }
+
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .vibrating {
+      animation: pumpVibration 0.5s infinite; /* Adjust the speed and style as needed */
     }
   </style>
 </head>
 
 <body>
   <script>
-    function updateDiagnostic(waterDetect, waterHeight) {
+    function updateDiagnostic(waterDetect, waterHeight, pumpActive) {
       var detectCheckbox = document.getElementById('detectCheckbox');
       var distanceCheckbox = document.getElementById('distanceCheckbox');
       detectCheckbox.checked = waterDetect;
@@ -110,9 +135,16 @@ const html = `
       // Add alert animation for water detection
       if (waterDetect) {
         document.body.classList.add('alert');
+        setTimeout(() => {
+          document.body.classList.remove('alert');
+        }, 1000);
       }
-      else{
-        document.body.classList.remove('alert');
+
+      // Add pump vibration animation
+      if (pumpActive) {
+        document.body.classList.add('vibrating');
+      } else {
+        document.body.classList.remove('vibrating');
       }
     }
 
@@ -184,7 +216,7 @@ const html = `
 
     function handleSensorData(data) {
       console.log('Received sensor data:', data);
-      updateDiagnostic(data.waterDetect, data.waterHeight);
+      updateDiagnostic(data.waterDetect, data.waterHeight, data.pumpActive);
     }
 
     function handleModeChange(mode) {
@@ -218,6 +250,7 @@ const html = `
 </body>
 
 </html>
+
 `;
 
 app.get("/", (req, res) => res.type('html').send(html));
