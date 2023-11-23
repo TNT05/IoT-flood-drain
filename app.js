@@ -110,9 +110,9 @@ const html = `
       // Add alert animation for water detection
       if (waterDetect) {
         document.body.classList.add('alert');
-        setTimeout(() => {
-          document.body.classList.remove('alert');
-        }, 2000);
+      }
+      else{
+        document.body.classList.remove('alert');
       }
     }
 
