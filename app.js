@@ -15,39 +15,117 @@ app.use(bodyParser.json());
 
 // HTML content
 const html = `
-<!-- File: index.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Water Diagnostic</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <style>
-    .water-theme {
+    body {
+      font-family: 'Arial', sans-serif;
       background-color: #f0f8ff; /* Light Blue */
       color: #003366; /* Dark Blue */
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      transition: background-color 1s ease; /* Background animation */
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #003366;
+    }
+
+    .control-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    input {
+      margin-top: 10px;
+    }
+
+    .fa-exclamation-triangle {
+      color: #FF6347; /* Tomato */
+    }
+
+    .fa-check-circle {
+      color: #32CD32; /* Lime Green */
+    }
+
+    a {
+      display: block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #003366;
+    }
+
+    /* Add animation */
+    @keyframes waterAlert {
+      0% {
+        background-color: inherit;
+      }
+
+      50% {
+        background-color: #add8e6; /* Light Blue */
+      }
+
+      100% {
+        background-color: inherit;
+      }
+    }
+
+    .alert {
+      animation: waterAlert 2s ease;
     }
   </style>
 </head>
-<body class="water-theme">
+
+<body>
   <script>
     function updateDiagnostic(waterDetect, waterHeight) {
       var detectCheckbox = document.getElementById('detectCheckbox');
       var distanceCheckbox = document.getElementById('distanceCheckbox');
       detectCheckbox.checked = waterDetect;
       distanceCheckbox.checked = waterHeight;
+
+      // Add alert animation for water detection
+      if (waterDetect) {
+        document.body.classList.add('alert');
+        setTimeout(() => {
+          document.body.classList.remove('alert');
+        }, 2000);
+      }
     }
 
     function activatePump() {
       fetch("https://iot-flood-drain.onrender.com/activatePump", {
-        method: "POST",
-        body: JSON.stringify({
-          activatePump: true
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      })
+          method: "POST",
+          body: JSON.stringify({
+            activatePump: true
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          }
+        })
         .then(response => response.json())
         .then(json => console.log(json))
         .catch(error => console.error('Error during mode change:', error));
@@ -55,14 +133,14 @@ const html = `
 
     function deactivatePump() {
       fetch("https://iot-flood-drain.onrender.com/activatePump", {
-        method: "POST",
-        body: JSON.stringify({
-          activatePump: false
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      })
+          method: "POST",
+          body: JSON.stringify({
+            activatePump: false
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          }
+        })
         .then(response => response.json())
         .then(json => console.log(json))
         .catch(error => console.error('Error during mode change:', error));
@@ -81,10 +159,9 @@ const html = `
         .then(response => response.json())
         .then(data => {
           console.log('Manual Mode:', data.manualMode);
-          if(data.manualMode){
+          if (data.manualMode) {
             enableManualControl();
-          }
-          else{
+          } else {
             disableManualControl();
           }
         })
@@ -97,7 +174,7 @@ const html = `
       activatePumpButton.disabled = false;
       deactivatePumpButton.disabled = false;
     }
-    
+
     function disableManualControl() {
       var activatePumpButton = document.getElementById('activateButton');
       var deactivatePumpButton = document.getElementById('deactivateButton');
@@ -112,14 +189,14 @@ const html = `
 
     function handleModeChange(mode) {
       fetch("https://iot-flood-drain.onrender.com/setManualMode", {
-        method: "POST",
-        body: JSON.stringify({
-          manualMode: mode
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      })
+          method: "POST",
+          body: JSON.stringify({
+            manualMode: mode
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          }
+        })
         .then(response => response.json())
         .then(json => console.log(json))
         .catch(error => console.error('Error during mode change:', error));
@@ -127,16 +204,19 @@ const html = `
   </script>
 
   <h1>Water Diagnostic</h1>
-  <div>
-    <button id="activateButton" onclick="activatePump()">Activate Pump</button>
-    <button id="deactivateButton" onclick="deactivatePump()">Deactivate Pump</button>
-    <button onclick="handleModeChange(true)">Manual Mode</button>
-    <button onclick="handleModeChange(false)">Automatic Mode</button>
-    <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
-    <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
+  <div class="control-buttons">
+    <button id="activateButton" onclick="activatePump()"><i class="fas fa-play"></i> Activate Pump</button>
+    <button id="deactivateButton" onclick="deactivatePump()"><i class="fas fa-stop"></i> Deactivate Pump</button>
+    <button onclick="handleModeChange(true)"><i class="fas fa-cogs"></i> Manual Mode</button>
+    <button onclick="handleModeChange(false)"><i class="fas fa-cogs"></i> Automatic Mode</button>
   </div>
+  <i class="fas fa-exclamation-triangle fa-2x"></i>
+  <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
+  <i class="fas fa-check-circle fa-2x"></i>
+  <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
   <a href="/inline">Go here</a>
 </body>
+
 </html>
 `;
 
