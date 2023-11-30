@@ -132,20 +132,14 @@ const html = `
       detectCheckbox.checked = waterDetect;
       distanceCheckbox.checked = waterHeight;
 
-      var waterDetectedSymbol = document.getElementById('waterDetectedSymbol');
-var waterHeightSymbol = document.getElementById('waterHeightSymbol');
+     var waterDetectedSymbol = document.getElementById('waterDetectedSymbol');
+     var waterHeightSymbol = document.getElementById('waterHeightSymbol');
 
-if (waterDetect) {
-  waterDetectedSymbol.classList.replace("fas fa-check-circle fa-2x", "fas fa-exclamation-triangle fa-2x");
-} else {
-  waterDetectedSymbol.classList.replace("fas fa-exclamation-triangle fa-2x", "fas fa-check-circle fa-2x");
-}
+     // Update waterDetectedSymbol
+     waterDetectedSymbol.className = waterDetect ? "fas fa-exclamation-triangle fa-2x" : "fas fa-check-circle fa-2x";
 
-if (waterHeight) {
-  waterHeightSymbol.classList.replace("fas fa-check-circle fa-2x", "fas fa-exclamation-triangle fa-2x");
-} else {
-  waterHeightSymbol.classList.replace("fas fa-exclamation-triangle fa-2x", "fas fa-check-circle fa-2x");
-}
+     // Update waterHeightSymbol
+     waterHeightSymbol.className = waterHeight ? "fas fa-exclamation-triangle fa-2x" : "fas fa-check-circle fa-2x";
 
 
       // Add alert animation for water detection
