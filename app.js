@@ -132,6 +132,27 @@ const html = `
       detectCheckbox.checked = waterDetect;
       distanceCheckbox.checked = waterHeight;
 
+      var waterDetectedSymbol = document.getElementById('waterDetectedSymbol');
+      var waterHeightSymbol = document.getElementById('waterHeightSymbol');
+
+      if(waterDetect){
+        waterDetectedSymbol.classList.remove("fas fa-check-circle fa-2x");
+        waterDetectedSymbol.classList.add("fas fa-exclamation-triangle fa-2x");
+      }
+      else{
+        waterDetectedSymbol.classList.remove("fas fa-exclamation-triangle fa-2x");
+        waterDetectedSymbol.classList.add("fas fa-check-circle fa-2x");
+      }
+
+      if(waterHeight){
+        waterHeightSymbol.classList.remove("fas fa-check-circle fa-2x");
+        waterHeightSymbol.classList.add("fas fa-exclamation-triangle fa-2x");
+      }
+      else{
+        waterHeightSymbol.classList.remove("fas fa-exclamation-triangle fa-2x");
+        waterHeightSymbol.classList.add("fas fa-check-circle fa-2x");
+      }
+
       // Add alert animation for water detection
       if (waterDetect) {
         document.body.classList.add('alert');
@@ -242,9 +263,9 @@ const html = `
     <button onclick="handleModeChange(true)"><i class="fas fa-cogs"></i> Manual Mode</button>
     <button onclick="handleModeChange(false)"><i class="fas fa-cogs"></i> Automatic Mode</button>
   </div>
-  <i class="fas fa-exclamation-triangle fa-2x"></i>
+  <i id="waterDetectedSymbol" class="fas fa-check-circle fa-2x"></i>
   <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
-  <i class="fas fa-check-circle fa-2x"></i>
+  <i id="waterHeightSymbol" class="fas fa-check-circle fa-2x"></i>
   <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
   <a href="/inline">Go here</a>
 </body>
