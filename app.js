@@ -133,25 +133,20 @@ const html = `
       distanceCheckbox.checked = waterHeight;
 
       var waterDetectedSymbol = document.getElementById('waterDetectedSymbol');
-      var waterHeightSymbol = document.getElementById('waterHeightSymbol');
+var waterHeightSymbol = document.getElementById('waterHeightSymbol');
 
-      if(waterDetect){
-        waterDetectedSymbol.classList.remove("fas fa-check-circle fa-2x");
-        waterDetectedSymbol.classList.add("fas fa-exclamation-triangle fa-2x");
-      }
-      else{
-        waterDetectedSymbol.classList.remove("fas fa-exclamation-triangle fa-2x");
-        waterDetectedSymbol.classList.add("fas fa-check-circle fa-2x");
-      }
+if (waterDetect) {
+  waterDetectedSymbol.classList.replace("fas fa-check-circle fa-2x", "fas fa-exclamation-triangle fa-2x");
+} else {
+  waterDetectedSymbol.classList.replace("fas fa-exclamation-triangle fa-2x", "fas fa-check-circle fa-2x");
+}
 
-      if(waterHeight){
-        waterHeightSymbol.classList.remove("fas fa-check-circle fa-2x");
-        waterHeightSymbol.classList.add("fas fa-exclamation-triangle fa-2x");
-      }
-      else{
-        waterHeightSymbol.classList.remove("fas fa-exclamation-triangle fa-2x");
-        waterHeightSymbol.classList.add("fas fa-check-circle fa-2x");
-      }
+if (waterHeight) {
+  waterHeightSymbol.classList.replace("fas fa-check-circle fa-2x", "fas fa-exclamation-triangle fa-2x");
+} else {
+  waterHeightSymbol.classList.replace("fas fa-exclamation-triangle fa-2x", "fas fa-check-circle fa-2x");
+}
+
 
       // Add alert animation for water detection
       if (waterDetect) {
