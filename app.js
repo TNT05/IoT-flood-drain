@@ -313,7 +313,7 @@ app.post("/activatePump", (req, res) => {
 // Route to handle incoming POST requests of pump activation from the CLIENT
 app.post("/deactivatePump", (req, res) => {
   const deactivatePumpRequest = req.body;
-  console.log('Received POST request from CLIENT:', activatePumpRequest);
+  console.log('Received POST request from CLIENT:', deactivatePumpRequest);
   ({ activatePump } = deactivatePumpRequest);
   res.json({ status: "success" });
 });
