@@ -317,3 +317,86 @@ const server = app.listen(port, () => console.log(`Example app listening on port
 // Timeout settings
 server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
+
+
+
+
+// HTML content for the login page
+const loginHtml = `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff; /* Light Blue */
+      color: #003366; /* Dark Blue */
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #003366;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    function login() {
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+
+      // Check credentials
+      if (username === 'admin' && password === 'admin') {
+        window.location.href = '/';
+      } else {
+        alert('Invalid credentials. Please try again.');
+      }
+    }
+  </script>
+
+  <h1>Login</h1>
+  <input type="text" id="username" placeholder="Username" required><br>
+  <input type="password" id="password" placeholder="Password" required><br>
+  <button onclick="login()">Login</button>
+</body>
+
+</html>
+`;
+
+// Route to handle the login page
+app.get("/login", (req, res) => res.type('html').send(loginHtml));
+
+// Middleware to protect routes
+app.use((req, res, next) => {
+  // Check if the user is authenticated
+  if (req.path !== '/login' && (!req.headers.authorization || req.headers.authorization !== 'Bearer admin')) {
+    return res.redirect('/login');
+  }
+  next();
+});
