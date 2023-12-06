@@ -256,7 +256,6 @@ const html = `
   <input type="checkbox" id="detectCheckbox" disabled> Water Detected</input><br>
   <i id="waterHeightSymbol" class="fas fa-check-circle fa-2x"></i>
   <input type="checkbox" id="distanceCheckbox" disabled> Water Distance</input><br>
-  <a href="/inline">Go here</a>
 </body>
 
 </html>
