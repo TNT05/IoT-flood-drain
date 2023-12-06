@@ -1,8 +1,12 @@
 # README
 
-This is the [Express](https://expressjs.com) [Hello world](https://expressjs.com/en/starter/hello-world.html) example on [Render](https://render.com).
+The Water Diagnostic Web Server is a Node.js-based server designed to facilitate the monitoring and control of a water diagnostic system. This system includes features such as real-time sensor data display, manual mode control, and pump activation management.
 
-The app in this repo is deployed at [https://express.onrender.com](https://express.onrender.com).
+Real-time Sensor Data Display: Receive and display water detection and water height sensor data in real-time.
+
+Manual and Automatic Modes: Switch between manual and automatic modes to control the water diagnostic system.
+
+Pump Activation: Activate and deactivate the pump remotely to manage water-related issues.
 
 ## Deployment
 
